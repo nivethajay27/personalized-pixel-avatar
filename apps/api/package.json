@@ -1,0 +1,28 @@
+{
+  "name": "@pixel/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/server.js",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "start": "node dist/server.js"
+  },
+  "dependencies": {
+    "@pixel/avatar-engine": "0.1.0",
+    "@pixel/shared-types": "0.1.0",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "pngjs": "^7.0.0",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
+    "@types/node": "^24.4.0",
+    "tsx": "^4.20.4",
+    "typescript": "^5.8.2"
+  }
+}
