@@ -36,6 +36,12 @@ npm run dev
 ```
 3. Open web app at `http://localhost:5173`
 
+## Backend Only
+Run just the API on port 8080:
+```bash
+npm run dev:api
+```
+
 ## API
 - `GET /health`
 - `POST /api/avatar/random` (optional `{ "seed": "my-seed" }`)
