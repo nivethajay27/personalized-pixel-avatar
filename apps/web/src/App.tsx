@@ -23,7 +23,7 @@ export function App(): JSX.Element {
   const areConfigsEqual = (left: AvatarConfig, right: AvatarConfig): boolean => JSON.stringify(left) === JSON.stringify(right);
 
   const pushHistory = (snapshot: AvatarConfig) => {
-    setHistory((prev) => [...prev.slice(-29), snapshot]);
+    setHistory((prev) => [...prev.slice(-5), snapshot]);
   };
 
   const applyConfig = (next: AvatarConfig, message?: string) => {
@@ -154,128 +154,134 @@ export function App(): JSX.Element {
         </section>
 
         <section className="controls-card">
-          <div className="control-actions">
-            <button type="button" className="action-button" onClick={undo} disabled={history.length === 0}>
-              Undo
-            </button>
-            <button type="button" className="action-button ghost" onClick={addFavorite}>
-              Save Favorite
-            </button>
-          </div>
-          <LayerSelector label="Background" value={config.background} options={PRESETS.background} onChange={(value) => patchConfig("background", value)} />
-          <LayerSelector
-            label="Background Pattern"
-            value={config.backgroundPattern}
-            options={PRESETS.backgroundPattern}
-            onChange={(value) => patchConfig("backgroundPattern", value)}
-          />
-          <div className="slider-row">
-            <label htmlFor="background-angle">Gradient Angle</label>
-            <input
-              id="background-angle"
-              type="range"
-              min={0}
-              max={180}
-              step={5}
-              value={config.backgroundAngle}
-              onChange={(event) => patchConfig("backgroundAngle", Number(event.target.value))}
-            />
-            <span className="slider-value">{config.backgroundAngle}°</span>
-          </div>
-          <LayerSelector label="Skin" value={config.skin} options={PRESETS.skin} onChange={(value) => patchConfig("skin", value)} />
-          <LayerSelector label="Eyes" value={config.eyes} options={PRESETS.eyes} onChange={(value) => patchConfig("eyes", value)} />
-          <LayerSelector label="Hair" value={config.hair} options={PRESETS.hair} onChange={(value) => patchConfig("hair", value)} />
-          <LayerSelector label="Eyebrows" value={config.eyebrows} options={PRESETS.eyebrows} onChange={(value) => patchConfig("eyebrows", value)} />
-          <LayerSelector label="Mouth" value={config.mouth} options={PRESETS.mouth} onChange={(value) => patchConfig("mouth", value)} />
-          <LayerSelector label="Facial Hair" value={config.facialHair} options={PRESETS.facialHair} onChange={(value) => patchConfig("facialHair", value)} />
-          <LayerSelector label="Clothing" value={config.clothing} options={PRESETS.clothing} onChange={(value) => patchConfig("clothing", value)} />
-          <LayerSelector label="Hat" value={config.hat} options={PRESETS.hat} onChange={(value) => patchConfig("hat", value)} />
-          <LayerSelector
-            label="Accessory"
-            value={config.accessory}
-            options={PRESETS.accessory}
-            onChange={(value) => patchConfig("accessory", value)}
-          />
+          <div className="controls-layout">
+            <div className="controls-primary">
+              <div className="control-actions">
+                <button type="button" className="action-button" onClick={undo} disabled={history.length === 0}>
+                  Undo
+                </button>
+                <button type="button" className="action-button ghost" onClick={addFavorite}>
+                  Save Favorite
+                </button>
+              </div>
+              <LayerSelector label="Background" value={config.background} options={PRESETS.background} onChange={(value) => patchConfig("background", value)} />
+              <LayerSelector
+                label="Background Pattern"
+                value={config.backgroundPattern}
+                options={PRESETS.backgroundPattern}
+                onChange={(value) => patchConfig("backgroundPattern", value)}
+              />
+              <div className="slider-row">
+                <label htmlFor="background-angle">Gradient Angle</label>
+                <input
+                  id="background-angle"
+                  type="range"
+                  min={0}
+                  max={180}
+                  step={5}
+                  value={config.backgroundAngle}
+                  onChange={(event) => patchConfig("backgroundAngle", Number(event.target.value))}
+                />
+                <span className="slider-value">{config.backgroundAngle}°</span>
+              </div>
+              <LayerSelector label="Skin" value={config.skin} options={PRESETS.skin} onChange={(value) => patchConfig("skin", value)} />
+              <LayerSelector label="Eyes" value={config.eyes} options={PRESETS.eyes} onChange={(value) => patchConfig("eyes", value)} />
+              <LayerSelector label="Hair" value={config.hair} options={PRESETS.hair} onChange={(value) => patchConfig("hair", value)} />
+              <LayerSelector label="Eyebrows" value={config.eyebrows} options={PRESETS.eyebrows} onChange={(value) => patchConfig("eyebrows", value)} />
+              <LayerSelector label="Mouth" value={config.mouth} options={PRESETS.mouth} onChange={(value) => patchConfig("mouth", value)} />
+              <LayerSelector label="Facial Hair" value={config.facialHair} options={PRESETS.facialHair} onChange={(value) => patchConfig("facialHair", value)} />
+              <LayerSelector label="Clothing" value={config.clothing} options={PRESETS.clothing} onChange={(value) => patchConfig("clothing", value)} />
+              <LayerSelector label="Hat" value={config.hat} options={PRESETS.hat} onChange={(value) => patchConfig("hat", value)} />
+              <LayerSelector
+                label="Accessory"
+                value={config.accessory}
+                options={PRESETS.accessory}
+                onChange={(value) => patchConfig("accessory", value)}
+              />
+            </div>
 
-          <div className="palette-section">
-            <h3>Palette Controls</h3>
-            <div className="palette-row">
-              <label htmlFor="skin-color">Skin Color</label>
-              <input
-                id="skin-color"
-                type="color"
-                value={config.skinColor ?? skinSwatch}
-                onChange={(event) => patchConfig("skinColor", event.target.value)}
-              />
-              <button type="button" className="ghost" onClick={() => patchConfig("skinColor", undefined)}>
-                Reset
-              </button>
-            </div>
-            <div className="palette-row">
-              <label htmlFor="eye-color">Eye Color</label>
-              <input
-                id="eye-color"
-                type="color"
-                value={config.eyeColor ?? eyeSwatch}
-                onChange={(event) => patchConfig("eyeColor", event.target.value)}
-              />
-              <button type="button" className="ghost" onClick={() => patchConfig("eyeColor", undefined)}>
-                Reset
-              </button>
-            </div>
-            <div className="palette-row">
-              <label htmlFor="hair-color">Hair Color</label>
-              <input
-                id="hair-color"
-                type="color"
-                value={config.hairColor ?? hairSwatch}
-                onChange={(event) => patchConfig("hairColor", event.target.value)}
-              />
-              <button type="button" className="ghost" onClick={() => patchConfig("hairColor", undefined)}>
-                Reset
-              </button>
-            </div>
-          </div>
+            <div className="controls-secondary">
+              <div className="palette-section">
+                <h3>Palette Controls</h3>
+                <div className="palette-row">
+                  <label htmlFor="skin-color">Skin Color</label>
+                  <input
+                    id="skin-color"
+                    type="color"
+                    value={config.skinColor ?? skinSwatch}
+                    onChange={(event) => patchConfig("skinColor", event.target.value)}
+                  />
+                  <button type="button" className="ghost" onClick={() => patchConfig("skinColor", undefined)}>
+                    Reset
+                  </button>
+                </div>
+                <div className="palette-row">
+                  <label htmlFor="eye-color">Eye Color</label>
+                  <input
+                    id="eye-color"
+                    type="color"
+                    value={config.eyeColor ?? eyeSwatch}
+                    onChange={(event) => patchConfig("eyeColor", event.target.value)}
+                  />
+                  <button type="button" className="ghost" onClick={() => patchConfig("eyeColor", undefined)}>
+                    Reset
+                  </button>
+                </div>
+                <div className="palette-row">
+                  <label htmlFor="hair-color">Hair Color</label>
+                  <input
+                    id="hair-color"
+                    type="color"
+                    value={config.hairColor ?? hairSwatch}
+                    onChange={(event) => patchConfig("hairColor", event.target.value)}
+                  />
+                  <button type="button" className="ghost" onClick={() => patchConfig("hairColor", undefined)}>
+                    Reset
+                  </button>
+                </div>
+              </div>
 
-          <div className="history-section">
-            <h3>History</h3>
-            {history.length === 0 ? (
-              <p className="muted">No history yet.</p>
-            ) : (
-              <div className="mini-grid">
+              <div className="history-section">
+                <h3>History</h3>
+                {history.length === 0 ? (
+                  <p className="muted">No history yet.</p>
+                ) : (
+                  <div className="mini-grid">
                 {history.slice(-6).reverse().map((item, index) => (
-                  <div key={`history-${index}`} className="mini-card">
-                    <AvatarCanvas config={item} size={16} scale={6} className="avatar-canvas mini-avatar" />
-                    <button type="button" className="ghost" onClick={() => applyHistorySnapshot(item)}>
-                      Restore
-                    </button>
+                      <div key={`history-${index}`} className="mini-card">
+                        <AvatarCanvas config={item} size={16} scale={6} className="avatar-canvas mini-avatar" />
+                        <button type="button" className="ghost" onClick={() => applyHistorySnapshot(item)}>
+                          Restore
+                        </button>
+                      </div>
+                    ))}
                   </div>
-                ))}
+                )}
               </div>
-            )}
-          </div>
 
-          <div className="favorites-section">
-            <h3>Favorites</h3>
-            {favorites.length === 0 ? (
-              <p className="muted">Save a look to keep it here.</p>
-            ) : (
-              <div className="mini-grid">
-                {favorites.map((item, index) => (
-                  <div key={`favorite-${index}`} className="mini-card">
-                    <AvatarCanvas config={item} size={16} scale={6} className="avatar-canvas mini-avatar" />
-                    <div className="mini-actions">
-                      <button type="button" className="ghost" onClick={() => applyFavorite(item)}>
-                        Apply
-                      </button>
-                      <button type="button" className="ghost" onClick={() => removeFavorite(index)}>
-                        Remove
-                      </button>
-                    </div>
+              <div className="favorites-section">
+                <h3>Favorites</h3>
+                {favorites.length === 0 ? (
+                  <p className="muted">Save a look to keep it here.</p>
+                ) : (
+                  <div className="mini-grid">
+                    {favorites.map((item, index) => (
+                      <div key={`favorite-${index}`} className="mini-card">
+                        <AvatarCanvas config={item} size={16} scale={6} className="avatar-canvas mini-avatar" />
+                        <div className="mini-actions">
+                          <button type="button" className="ghost" onClick={() => applyFavorite(item)}>
+                            Apply
+                          </button>
+                          <button type="button" className="ghost" onClick={() => removeFavorite(index)}>
+                            Remove
+                          </button>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                ))}
+                )}
               </div>
-            )}
+            </div>
           </div>
         </section>
       </main>
