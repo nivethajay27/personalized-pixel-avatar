@@ -216,6 +216,13 @@ body {
   gap: 1rem;
 }
 
+.control-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}
+
 .layer-group {
   display: grid;
   gap: 0.55rem;
@@ -262,6 +269,113 @@ body {
   height: 12px;
   border-radius: 50%;
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.38);
+}
+
+.ghost {
+  border: 1px solid rgba(148, 163, 184, 0.5);
+  background: rgba(15, 23, 42, 0.45);
+  color: #e2e8f0;
+  padding: 0.5rem 0.8rem;
+  border-radius: 10px;
+  cursor: pointer;
+  font: inherit;
+}
+
+.action-button.ghost {
+  background: rgba(15, 23, 42, 0.45);
+  color: #e2e8f0;
+}
+
+.slider-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.35rem 0;
+}
+
+.slider-row label {
+  color: var(--ink-soft);
+  font-size: 0.92rem;
+}
+
+.slider-row input[type="range"] {
+  width: 100%;
+  accent-color: var(--accent);
+}
+
+.slider-value {
+  font-size: 0.85rem;
+  color: #cbd5f5;
+}
+
+.palette-section,
+.history-section,
+.favorites-section {
+  border-top: 1px solid rgba(148, 163, 184, 0.2);
+  padding-top: 1rem;
+}
+
+.palette-section h3,
+.history-section h3,
+.favorites-section h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+  color: #edf2ff;
+}
+
+.palette-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 0.75rem;
+  align-items: center;
+  margin-bottom: 0.6rem;
+}
+
+.palette-row label {
+  color: var(--ink-soft);
+  font-size: 0.92rem;
+}
+
+.palette-row input[type="color"] {
+  width: 56px;
+  height: 34px;
+  border: none;
+  background: transparent;
+  padding: 0;
+}
+
+.muted {
+  color: var(--ink-soft);
+  margin: 0;
+}
+
+.mini-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.75rem;
+}
+
+.mini-card {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 14px;
+  padding: 0.75rem;
+  display: grid;
+  gap: 0.5rem;
+  justify-items: center;
+}
+
+.mini-avatar {
+  width: 100%;
+  max-width: 110px;
+}
+
+.mini-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 @keyframes float {

@@ -1,5 +1,17 @@
 import type { AvatarConfig } from "@pixel/shared-types";
-import { ACCESSORY_IDS, BACKGROUND_IDS, EYE_IDS, HAIR_IDS, SKIN_IDS } from "./presets";
+import {
+  ACCESSORY_IDS,
+  BACKGROUND_IDS,
+  BACKGROUND_PATTERN_IDS,
+  CLOTHING_IDS,
+  EYEBROW_IDS,
+  EYE_IDS,
+  FACIAL_HAIR_IDS,
+  HAIR_IDS,
+  HAT_IDS,
+  MOUTH_IDS,
+  SKIN_IDS
+} from "./presets";
 import { normalizeAvatarConfig } from "./validate";
 
 function xmur3(seed: string): () => number {
@@ -36,9 +48,16 @@ export function randomAvatarConfig(seed?: string): AvatarConfig {
 
   return normalizeAvatarConfig({
     background: pick(BACKGROUND_IDS, rng),
+    backgroundPattern: pick(BACKGROUND_PATTERN_IDS, rng),
+    backgroundAngle: pick([0, 45, 90, 135, 180], rng),
     skin: pick(SKIN_IDS, rng),
     eyes: pick(EYE_IDS, rng),
     hair: pick(HAIR_IDS, rng),
+    eyebrows: pick(EYEBROW_IDS, rng),
+    mouth: pick(MOUTH_IDS, rng),
+    facialHair: pick(FACIAL_HAIR_IDS, rng),
+    clothing: pick(CLOTHING_IDS, rng),
+    hat: pick(HAT_IDS, rng),
     accessory: pick(ACCESSORY_IDS, rng)
   });
 }

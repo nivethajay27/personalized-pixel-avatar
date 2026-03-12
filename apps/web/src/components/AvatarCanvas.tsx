@@ -6,9 +6,10 @@ interface AvatarCanvasProps {
   config: AvatarConfig;
   size?: number;
   scale?: number;
+  className?: string;
 }
 
-export function AvatarCanvas({ config, size = 16, scale = 18 }: AvatarCanvasProps): JSX.Element {
+export function AvatarCanvas({ config, size = 16, scale = 18, className }: AvatarCanvasProps): JSX.Element {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
@@ -43,5 +44,5 @@ export function AvatarCanvas({ config, size = 16, scale = 18 }: AvatarCanvasProp
     context.drawImage(offscreen, 0, 0, width, width);
   }, [config, scale, size]);
 
-  return <canvas ref={canvasRef} className="avatar-canvas" aria-label="Avatar preview" />;
+  return <canvas ref={canvasRef} className={className ?? "avatar-canvas"} aria-label="Avatar preview" />;
 }

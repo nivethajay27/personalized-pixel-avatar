@@ -41,6 +41,19 @@ const backgroundPalette = {
   neon: ["#22d3ee", "#a855f7"]
 } as const;
 
+const clothingPalette = {
+  tee: "#38bdf8",
+  hoodie: "#a855f7",
+  jacket: "#f97316",
+  armor: "#94a3b8"
+} as const;
+
+const hatPalette = {
+  beanie: "#0ea5e9",
+  cap: "#475569",
+  crown: "#facc15"
+} as const;
+
 const accessoryPalette = {
   none: "#00000000",
   glasses: "#0f172a",
@@ -48,12 +61,21 @@ const accessoryPalette = {
   earring: "#fde047",
   headset: "#22d3ee",
   mask: "#0ea5e9",
-  cap: "#475569",
-  crown: "#facc15",
   visor: "#67e8f980"
 } as const;
 
 function parseHex(color: string): [number, number, number, number] {
+  if (color.startsWith("#") && color.length === 4) {
+    const r = color[1];
+    const g = color[2];
+    const b = color[3];
+    return [
+      parseInt(`${r}${r}`, 16),
+      parseInt(`${g}${g}`, 16),
+      parseInt(`${b}${b}`, 16),
+      255
+    ];
+  }
   if (color.startsWith("#") && color.length === 9) {
     return [
       parseInt(color.slice(1, 3), 16),
@@ -81,6 +103,23 @@ function paintPixel(buffer: Uint8ClampedArray, size: number, x: number, y: numbe
   buffer[index + 3] = color[3];
 }
 
+function blendPixel(buffer: Uint8ClampedArray, size: number, x: number, y: number, color: [number, number, number, number]): void {
+  if (x < 0 || y < 0 || x >= size || y >= size || color[3] === 0) {
+    return;
+  }
+  const index = (y * size + x) * 4;
+  const srcA = color[3] / 255;
+  const dstA = buffer[index + 3] / 255;
+  const outA = srcA + dstA * (1 - srcA);
+  if (outA <= 0) {
+    return;
+  }
+  buffer[index] = Math.round((color[0] * srcA + buffer[index] * dstA * (1 - srcA)) / outA);
+  buffer[index + 1] = Math.round((color[1] * srcA + buffer[index + 1] * dstA * (1 - srcA)) / outA);
+  buffer[index + 2] = Math.round((color[2] * srcA + buffer[index + 2] * dstA * (1 - srcA)) / outA);
+  buffer[index + 3] = Math.round(outA * 255);
+}
+
 function fillRect(
   buffer: Uint8ClampedArray,
   size: number,
@@ -97,32 +136,71 @@ function fillRect(
   }
 }
 
-function drawBackground(buffer: Uint8ClampedArray, size: number, background: AvatarConfig["background"]): void {
+function drawBackground(
+  buffer: Uint8ClampedArray,
+  size: number,
+  background: AvatarConfig["background"],
+  pattern: AvatarConfig["backgroundPattern"],
+  angle: number
+): void {
   const [topHex, bottomHex] = backgroundPalette[background];
   const top = parseHex(topHex);
   const bottom = parseHex(bottomHex);
+  const radians = (angle * Math.PI) / 180;
+  const dx = Math.cos(radians);
+  const dy = Math.sin(radians);
 
   for (let y = 0; y < size; y += 1) {
-    const t = y / Math.max(1, size - 1);
-    const row: [number, number, number, number] = [
-      Math.round(top[0] * (1 - t) + bottom[0] * t),
-      Math.round(top[1] * (1 - t) + bottom[1] * t),
-      Math.round(top[2] * (1 - t) + bottom[2] * t),
-      255
-    ];
-
     for (let x = 0; x < size; x += 1) {
-      paintPixel(buffer, size, x, y, row);
+      const nx = size > 1 ? x / (size - 1) : 0.5;
+      const ny = size > 1 ? y / (size - 1) : 0.5;
+      const t = Math.min(1, Math.max(0, (nx - 0.5) * dx + (ny - 0.5) * dy + 0.5));
+      const color: [number, number, number, number] = [
+        Math.round(top[0] * (1 - t) + bottom[0] * t),
+        Math.round(top[1] * (1 - t) + bottom[1] * t),
+        Math.round(top[2] * (1 - t) + bottom[2] * t),
+        255
+      ];
+      paintPixel(buffer, size, x, y, color);
     }
   }
 
   for (let i = 0; i < size; i += 2) {
     paintPixel(buffer, size, i, Math.floor(size * 0.25), [255, 255, 255, 80]);
   }
+
+  if (pattern === "stripes") {
+    for (let y = 0; y < size; y += 2) {
+      for (let x = 0; x < size; x += 1) {
+        blendPixel(buffer, size, x, y, [255, 255, 255, 28]);
+      }
+    }
+  }
+
+  if (pattern === "dots") {
+    for (let y = 1; y < size; y += 3) {
+      for (let x = 1; x < size; x += 3) {
+        blendPixel(buffer, size, x, y, [255, 255, 255, 45]);
+      }
+    }
+  }
+
+  if (pattern === "checker") {
+    for (let y = 0; y < size; y += 2) {
+      for (let x = 0; x < size; x += 2) {
+        if ((x + y) % 4 === 0) {
+          blendPixel(buffer, size, x, y, [255, 255, 255, 30]);
+          blendPixel(buffer, size, x + 1, y, [255, 255, 255, 30]);
+          blendPixel(buffer, size, x, y + 1, [255, 255, 255, 30]);
+          blendPixel(buffer, size, x + 1, y + 1, [255, 255, 255, 30]);
+        }
+      }
+    }
+  }
 }
 
-function drawHead(buffer: Uint8ClampedArray, size: number, skin: AvatarConfig["skin"]): void {
-  const skinColor = parseHex(skinPalette[skin]);
+function drawHead(buffer: Uint8ClampedArray, size: number, skin: AvatarConfig["skin"], skinColorOverride?: string): void {
+  const skinColor = parseHex(skinColorOverride ?? skinPalette[skin]);
   const shade: [number, number, number, number] = [
     Math.max(0, skinColor[0] - 20),
     Math.max(0, skinColor[1] - 20),
@@ -138,8 +216,8 @@ function drawHead(buffer: Uint8ClampedArray, size: number, skin: AvatarConfig["s
   }
 }
 
-function drawHair(buffer: Uint8ClampedArray, size: number, hair: AvatarConfig["hair"]): void {
-  const hairHex = hairPalette[hair];
+function drawHair(buffer: Uint8ClampedArray, size: number, hair: AvatarConfig["hair"], hairColorOverride?: string): void {
+  const hairHex = hairColorOverride ?? hairPalette[hair];
   if (hairHex === "#00000000") {
     return;
   }
@@ -191,8 +269,8 @@ function drawHair(buffer: Uint8ClampedArray, size: number, hair: AvatarConfig["h
   }
 }
 
-function drawEyes(buffer: Uint8ClampedArray, size: number, eyes: AvatarConfig["eyes"]): void {
-  const color = parseHex(eyePalette[eyes]);
+function drawEyes(buffer: Uint8ClampedArray, size: number, eyes: AvatarConfig["eyes"], eyeColorOverride?: string): void {
+  const color = parseHex(eyeColorOverride ?? eyePalette[eyes]);
 
   if (eyes === "sleepy") {
     fillRect(buffer, size, 5, 7, 2, 1, color);
@@ -235,8 +313,147 @@ function drawEyes(buffer: Uint8ClampedArray, size: number, eyes: AvatarConfig["e
   }
 }
 
-function drawMouth(buffer: Uint8ClampedArray, size: number): void {
-  fillRect(buffer, size, 7, 10, 2, 1, [55, 25, 25, 255]);
+function drawMouth(buffer: Uint8ClampedArray, size: number, mouth: AvatarConfig["mouth"]): void {
+  const lip: [number, number, number, number] = [120, 47, 47, 255];
+  const bright: [number, number, number, number] = [255, 255, 255, 230];
+
+  if (mouth === "neutral") {
+    fillRect(buffer, size, 6, 10, 4, 1, lip);
+    return;
+  }
+
+  if (mouth === "open") {
+    fillRect(buffer, size, 6, 10, 4, 2, [60, 20, 20, 255]);
+    fillRect(buffer, size, 6, 10, 4, 1, lip);
+    return;
+  }
+
+  if (mouth === "smirk") {
+    fillRect(buffer, size, 7, 10, 3, 1, lip);
+    paintPixel(buffer, size, 10, 9, lip);
+    return;
+  }
+
+  if (mouth === "teeth") {
+    fillRect(buffer, size, 6, 10, 4, 1, bright);
+    paintPixel(buffer, size, 6, 11, lip);
+    paintPixel(buffer, size, 9, 11, lip);
+    return;
+  }
+
+  fillRect(buffer, size, 7, 10, 2, 1, lip);
+}
+
+function drawEyebrows(
+  buffer: Uint8ClampedArray,
+  size: number,
+  eyebrows: AvatarConfig["eyebrows"],
+  hairColorOverride?: string,
+  hair: AvatarConfig["hair"]
+): void {
+  const fallback = hair === "none" ? "#64748b" : hairPalette[hair];
+  const baseColor = parseHex(hairColorOverride ?? fallback);
+  if (eyebrows === "soft") {
+    fillRect(buffer, size, 5, 6, 2, 1, baseColor);
+    fillRect(buffer, size, 9, 6, 2, 1, baseColor);
+  }
+  if (eyebrows === "straight") {
+    fillRect(buffer, size, 4, 6, 3, 1, baseColor);
+    fillRect(buffer, size, 9, 6, 3, 1, baseColor);
+  }
+  if (eyebrows === "arch") {
+    paintPixel(buffer, size, 5, 5, baseColor);
+    paintPixel(buffer, size, 6, 6, baseColor);
+    paintPixel(buffer, size, 9, 6, baseColor);
+    paintPixel(buffer, size, 10, 5, baseColor);
+  }
+  if (eyebrows === "fierce") {
+    paintPixel(buffer, size, 4, 6, baseColor);
+    paintPixel(buffer, size, 5, 5, baseColor);
+    paintPixel(buffer, size, 10, 5, baseColor);
+    paintPixel(buffer, size, 11, 6, baseColor);
+  }
+}
+
+function drawFacialHair(
+  buffer: Uint8ClampedArray,
+  size: number,
+  facialHair: AvatarConfig["facialHair"],
+  hairColorOverride?: string,
+  hair: AvatarConfig["hair"]
+): void {
+  if (facialHair === "none") {
+    return;
+  }
+  const fallback = hair === "none" ? "#475569" : hairPalette[hair];
+  const color = parseHex(hairColorOverride ?? fallback);
+
+  if (facialHair === "stubble") {
+    for (let x = 6; x <= 9; x += 1) {
+      paintPixel(buffer, size, x, 11, color);
+    }
+    return;
+  }
+
+  if (facialHair === "mustache") {
+    fillRect(buffer, size, 6, 9, 4, 1, color);
+    return;
+  }
+
+  if (facialHair === "goatee") {
+    fillRect(buffer, size, 7, 11, 2, 2, color);
+    paintPixel(buffer, size, 7, 10, color);
+    paintPixel(buffer, size, 8, 10, color);
+    return;
+  }
+
+  if (facialHair === "beard") {
+    fillRect(buffer, size, 5, 9, 6, 4, color);
+  }
+}
+
+function drawClothing(buffer: Uint8ClampedArray, size: number, clothing: AvatarConfig["clothing"]): void {
+  const color = parseHex(clothingPalette[clothing]);
+  fillRect(buffer, size, 4, 12, 8, 3, color);
+
+  if (clothing === "hoodie") {
+    paintPixel(buffer, size, 6, 12, [255, 255, 255, 120]);
+    paintPixel(buffer, size, 9, 12, [255, 255, 255, 120]);
+  }
+
+  if (clothing === "jacket") {
+    paintPixel(buffer, size, 7, 12, [255, 255, 255, 120]);
+    paintPixel(buffer, size, 8, 12, [255, 255, 255, 120]);
+  }
+
+  if (clothing === "armor") {
+    fillRect(buffer, size, 6, 12, 4, 1, [255, 255, 255, 120]);
+    fillRect(buffer, size, 6, 14, 4, 1, [255, 255, 255, 120]);
+  }
+}
+
+function drawHat(buffer: Uint8ClampedArray, size: number, hat: AvatarConfig["hat"]): void {
+  if (hat === "none") {
+    return;
+  }
+  const color = parseHex(hatPalette[hat]);
+
+  if (hat === "beanie") {
+    fillRect(buffer, size, 4, 2, 8, 2, color);
+    fillRect(buffer, size, 5, 1, 6, 1, color);
+  }
+
+  if (hat === "cap") {
+    fillRect(buffer, size, 4, 2, 8, 2, color);
+    fillRect(buffer, size, 3, 4, 10, 1, color);
+  }
+
+  if (hat === "crown") {
+    paintPixel(buffer, size, 5, 2, color);
+    paintPixel(buffer, size, 7, 1, color);
+    paintPixel(buffer, size, 9, 2, color);
+    fillRect(buffer, size, 4, 3, 8, 1, color);
+  }
 }
 
 function drawAccessory(buffer: Uint8ClampedArray, size: number, accessory: AvatarConfig["accessory"]): void {
@@ -271,18 +488,6 @@ function drawAccessory(buffer: Uint8ClampedArray, size: number, accessory: Avata
     paintPixel(buffer, size, 12, 10, color);
   }
 
-  if (accessory === "cap") {
-    fillRect(buffer, size, 4, 2, 8, 2, color);
-    fillRect(buffer, size, 3, 4, 10, 1, color);
-  }
-
-  if (accessory === "crown") {
-    paintPixel(buffer, size, 5, 2, color);
-    paintPixel(buffer, size, 7, 1, color);
-    paintPixel(buffer, size, 9, 2, color);
-    fillRect(buffer, size, 4, 3, 8, 1, color);
-  }
-
   if (accessory === "visor") {
     fillRect(buffer, size, 4, 7, 8, 2, color);
   }
@@ -290,11 +495,15 @@ function drawAccessory(buffer: Uint8ClampedArray, size: number, accessory: Avata
 
 export function renderAvatarPixels(config: AvatarConfig, size = 16): Uint8ClampedArray {
   const buffer = new Uint8ClampedArray(size * size * 4);
-  drawBackground(buffer, size, config.background);
-  drawHead(buffer, size, config.skin);
-  drawHair(buffer, size, config.hair);
-  drawEyes(buffer, size, config.eyes);
-  drawMouth(buffer, size);
+  drawBackground(buffer, size, config.background, config.backgroundPattern, config.backgroundAngle);
+  drawClothing(buffer, size, config.clothing);
+  drawHead(buffer, size, config.skin, config.skinColor);
+  drawHair(buffer, size, config.hair, config.hairColor);
+  drawEyebrows(buffer, size, config.eyebrows, config.hairColor, config.hair);
+  drawEyes(buffer, size, config.eyes, config.eyeColor);
+  drawMouth(buffer, size, config.mouth);
+  drawFacialHair(buffer, size, config.facialHair, config.hairColor, config.hair);
+  drawHat(buffer, size, config.hat);
   drawAccessory(buffer, size, config.accessory);
 
   for (let y = 0; y < size; y += 1) {
