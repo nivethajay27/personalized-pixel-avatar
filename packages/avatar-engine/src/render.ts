@@ -1,6 +1,6 @@
 import type { AvatarConfig } from "@pixel/shared-types";
 
-const TRANSPARENT = [0, 0, 0, 0] as const;
+const TRANSPARENT: [number, number, number, number] = [0, 0, 0, 0];
 
 const skinPalette = {
   light: "#f5d2b3",
@@ -348,8 +348,8 @@ function drawEyebrows(
   buffer: Uint8ClampedArray,
   size: number,
   eyebrows: AvatarConfig["eyebrows"],
-  hairColorOverride?: string,
-  hair: AvatarConfig["hair"]
+  hair: AvatarConfig["hair"],
+  hairColorOverride?: string
 ): void {
   const fallback = hair === "none" ? "#64748b" : hairPalette[hair];
   const baseColor = parseHex(hairColorOverride ?? fallback);
@@ -379,8 +379,8 @@ function drawFacialHair(
   buffer: Uint8ClampedArray,
   size: number,
   facialHair: AvatarConfig["facialHair"],
-  hairColorOverride?: string,
-  hair: AvatarConfig["hair"]
+  hair: AvatarConfig["hair"],
+  hairColorOverride?: string
 ): void {
   if (facialHair === "none") {
     return;
@@ -499,10 +499,10 @@ export function renderAvatarPixels(config: AvatarConfig, size = 16): Uint8Clampe
   drawClothing(buffer, size, config.clothing);
   drawHead(buffer, size, config.skin, config.skinColor);
   drawHair(buffer, size, config.hair, config.hairColor);
-  drawEyebrows(buffer, size, config.eyebrows, config.hairColor, config.hair);
+  drawEyebrows(buffer, size, config.eyebrows, config.hair, config.hairColor);
   drawEyes(buffer, size, config.eyes, config.eyeColor);
   drawMouth(buffer, size, config.mouth);
-  drawFacialHair(buffer, size, config.facialHair, config.hairColor, config.hair);
+  drawFacialHair(buffer, size, config.facialHair, config.hair, config.hairColor);
   drawHat(buffer, size, config.hat);
   drawAccessory(buffer, size, config.accessory);
 
