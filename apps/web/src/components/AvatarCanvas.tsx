@@ -29,7 +29,7 @@ export function AvatarCanvas({ config, size = 16, scale = 18, className }: Avata
 
     context.imageSmoothingEnabled = false;
     const pixels = renderAvatarPixels(config, size);
-    const imageData = new ImageData(pixels, size, size);
+    const imageData = new ImageData(new Uint8ClampedArray(pixels), size, size);
 
     const offscreen = document.createElement("canvas");
     offscreen.width = size;
