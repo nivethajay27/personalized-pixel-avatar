@@ -11,8 +11,8 @@ import {
   HAT_IDS,
   MOUTH_IDS,
   SKIN_IDS
-} from "./presets";
-import { normalizeAvatarConfig } from "./validate";
+} from "./presets.js";
+import { normalizeAvatarConfig } from "./validate.js";
 
 function xmur3(seed: string): () => number {
   let h = 1779033703 ^ seed.length;

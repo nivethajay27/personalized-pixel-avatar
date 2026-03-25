@@ -11,7 +11,7 @@ import {
   HAT_IDS,
   MOUTH_IDS,
   SKIN_IDS
-} from "./presets";
+} from "./presets.js";
 
 function isHexColor(value: string | undefined): value is string {
   if (!value) {

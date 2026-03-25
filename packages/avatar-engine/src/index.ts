@@ -1,5 +1,5 @@
-export { PRESETS } from "./presets";
-export { DEFAULT_AVATAR_CONFIG } from "./defaults";
-export { normalizeAvatarConfig, validateAvatarConfig } from "./validate";
-export { randomAvatarConfig } from "./random";
-export { renderAvatarPixels } from "./render";
+export { PRESETS } from "./presets.js";
+export { DEFAULT_AVATAR_CONFIG } from "./defaults.js";
+export { normalizeAvatarConfig, validateAvatarConfig } from "./validate.js";
+export { randomAvatarConfig } from "./random.js";
+export { renderAvatarPixels } from "./render.js";
