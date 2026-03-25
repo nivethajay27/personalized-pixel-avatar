@@ -2,8 +2,8 @@ import express from "express";
 import cors from "cors";
 import { PRESETS, normalizeAvatarConfig, randomAvatarConfig, renderAvatarPixels, validateAvatarConfig } from "@pixel/avatar-engine";
 import type { AvatarConfig } from "@pixel/shared-types";
-import { pixelsToPngBuffer } from "./png";
-import { randomRequestSchema, renderRequestSchema } from "./schemas";
+import { pixelsToPngBuffer } from "./png.js";
+import { randomRequestSchema, renderRequestSchema } from "./schemas.js";
 
 const app = express();
 const PORT = Number(process.env.PORT || 8080);
