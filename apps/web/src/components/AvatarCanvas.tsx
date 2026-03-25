@@ -9,7 +9,7 @@ interface AvatarCanvasProps {
   className?: string;
 }
 
-export function AvatarCanvas({ config, size = 16, scale = 18, className }: AvatarCanvasProps): JSX.Element {
+export function AvatarCanvas({ config, size = 16, scale = 18, className }: AvatarCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {

@@ -7,7 +7,7 @@ interface LayerSelectorProps<T extends string> {
   onChange: (nextValue: T) => void;
 }
 
-export function LayerSelector<T extends string>({ label, value, options, onChange }: LayerSelectorProps<T>): JSX.Element {
+export function LayerSelector<T extends string>({ label, value, options, onChange }: LayerSelectorProps<T>) {
   return (
     <section className="layer-group">
       <header className="layer-header">

@@ -7,7 +7,7 @@ import { downloadAvatar, fetchRandomAvatar } from "./lib/api";
 
 const initialSeed = "neo-city";
 
-export function App(): JSX.Element {
+export function App() {
   const [config, setConfig] = useState<AvatarConfig>(DEFAULT_AVATAR_CONFIG);
   const [seed, setSeed] = useState<string>(initialSeed);
   const [status, setStatus] = useState<string>("Pick layers or randomize to start.");
